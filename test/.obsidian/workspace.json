@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "dev-3d.md",
+                "file": "Desmos 3D Demo.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "dev-3d"
+              "title": "Desmos 3D Demo"
             }
           }
         ]
@@ -186,6 +186,6 @@
   "active": "8e7964e9975c54c7",
   "lastOpenFiles": [
     "test.md",
-    "dev-3d.md"
+    "Desmos 3D Demo.md"
   ]
 }
