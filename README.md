@@ -1,5 +1,7 @@
 # Obsidian 3D Graphing
 
+![[./example.png]]
+
 A fork of [Obsidian Desmos](https://github.com/Nigecat/obsidian-desmos) that supports 3D graphing using [Desmos 3D](https://www.desmos.com/calculator/3d).
 
 ## Installation
