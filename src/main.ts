@@ -1,8 +1,19 @@
-import { Graph } from "./graph";
+import { parse2D, parse3D } from "./graph";
 import { normalizePath, Plugin } from "obsidian";
 import { Renderer } from "./renderer";
 import { renderError } from "./error";
 import { DEFAULT_SETTINGS, migrateSettings, Settings, SettingsTab } from "./settings";
+
+function handleError(err: unknown, el: HTMLElement): void {
+    if (err instanceof Error) {
+        renderError(err.message, el);
+    } else if (typeof err === "string") {
+        renderError(err, el);
+    } else {
+        renderError("Unexpected error - see console for debug log", el);
+        console.error(err);
+    }
+}
 
 export default class Desmos extends Plugin {
     // We load the settings before accessing them, so we can ensure this object always exists
@@ -13,6 +24,9 @@ export default class Desmos extends Plugin {
 
     /** Helper for in-memory graph caching */
     graphCache: Record<string, string> = {};
+
+    /** Helper for in-memory calculator state caching (3D camera persistence) */
+    stateCache: Record<string, string> = {};
 
     /** A cache that stores the Desmos API */
     desmosApiCache: string | null = null;
@@ -26,17 +40,19 @@ export default class Desmos extends Plugin {
 
         this.registerMarkdownCodeBlockProcessor("desmos-graph", async (source, el) => {
             try {
-                const graph = Graph.parse(source);
+                const graph = parse2D(source);
                 await this.renderer.render(graph, el);
             } catch (err) {
-                if (err instanceof Error) {
-                    renderError(err.message, el);
-                } else if (typeof err === "string") {
-                    renderError(err, el);
-                } else {
-                    renderError("Unexpected error - see console for debug log", el);
-                    console.error(err);
-                }
+                handleError(err, el);
+            }
+        });
+
+        this.registerMarkdownCodeBlockProcessor("desmos-graph-3d", async (source, el) => {
+            try {
+                const graph = parse3D(source);
+                await this.renderer.render(graph, el);
+            } catch (err) {
+                handleError(err, el);
             }
         });
 
@@ -66,7 +82,7 @@ export default class Desmos extends Plugin {
     }
 
     async tryCacheDesmosApi(): Promise<string> {
-        const api_version = "v1.9"; // todo move this to the config
+        const api_version = "v1.11"; // todo move this to the config
         const api = `https://www.desmos.com/api/${api_version}/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6`;
 
         if (normalizePath == null) {

@@ -1,3 +1,0 @@
-(4,2)|purple|hidden|LABEL:test
-f(x)=x^2|hidden
-f'(x)

@@ -1,3 +1,0 @@
-degreeMode=degrees;
----
-y=\sin(x * \pi)

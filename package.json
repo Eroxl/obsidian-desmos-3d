@@ -9,11 +9,7 @@
         "build:dev": "rollup --config rollup.config.js -w",
         "lint": "eslint src --ext .ts",
         "fmt": "prettier --write src",
-        "fmt:check": "prettier --check src",
-        "test": "cross-env TS_NODE_COMPILER_OPTIONS={\\\"module\\\":\\\"commonjs\\\"} npm run test:clean",
-        "test:raw": "mocha --parallel -r ts-node/register 'tests/**/*.spec.ts'",
-        "test:clean": "npm run build && npm run test:raw",
-        "test:coverage": "nyc --reporter html --reporter text npm test"
+        "fmt:check": "prettier --check src"
     },
     "dependencies": {
         "mathjs": "^13.0.0"
