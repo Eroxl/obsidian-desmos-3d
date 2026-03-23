@@ -9,8 +9,6 @@ export enum CacheLocation {
 export interface Settings {
     /** The program version these settings were created in */
     version: string;
-    // /** The debounce timer (in ms) */
-    // debounce: number;
     /** Whether the renderer is enabled */
     renderer: boolean;
     cache: CacheSettings;
@@ -23,11 +21,11 @@ export interface CacheSettings {
 }
 
 const DEFAULT_SETTINGS_STATIC: Omit<Settings, "version"> = {
-    // debounce: 500,
     renderer: true,
     cache: {
         enabled: true,
-        location: CacheLocation.Memory,
+        location: CacheLocation.Filesystem,
+        directory: ".obsidian/desmos-cache",
     },
 };
 
@@ -62,20 +60,6 @@ export class SettingsTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        // new Setting(containerEl)
-        //     .setName("Debounce Time (ms)")
-        //     .setDesc(
-        //         "How long to wait after a keypress to render the graph (set to 0 to disable, requires restart to take effect)"
-        //     )
-        //     .addText((text) =>
-        //         text.setValue(this.plugin.settings.debounce.toString()).onChange(async (value) => {
-        //             const val = parseInt(value);
-        //             this.plugin.settings.debounce =
-        //                 Number.isNaN(val) || val < 0 ? DEFAULT_SETTINGS_STATIC.debounce : val;
-        //             await this.plugin.saveSettings();
-        //         })
-        //     );
-
         new Setting(containerEl)
             .setName("Cache")
             .setDesc("Whether to cache the rendered graphs")
@@ -100,7 +84,7 @@ export class SettingsTab extends PluginSettingTab {
                         .setValue(this.plugin.settings.cache.location)
                         .onChange(async (value) => {
                             this.plugin.settings.cache.location = value as CacheLocation;
-                            if (this.plugin.settings.cache.location != CacheLocation.Filesystem) {
+                            if (this.plugin.settings.cache.location !== CacheLocation.Filesystem) {
                                 this.plugin.settings.renderer = true;
                             }
                             await this.plugin.saveSettings();

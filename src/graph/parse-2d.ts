@@ -30,7 +30,7 @@ const DEFAULT_2D_SETTINGS: Graph2DSettings = {
 const DEFAULT_GRAPH_WIDTH = Math.abs(DEFAULT_2D_SETTINGS.left) + Math.abs(DEFAULT_2D_SETTINGS.right);
 const DEFAULT_GRAPH_HEIGHT = Math.abs(DEFAULT_2D_SETTINGS.bottom) + Math.abs(DEFAULT_2D_SETTINGS.top);
 
-function parseSettings2D(raw: string): Partial<Graph2DSettings> {
+function parseSettings2D(raw: string, themeColors?: Record<string, string>): Partial<Graph2DSettings> {
     const settings: Partial<Graph2DSettings> = {};
     const entries = extractSettingsEntries(raw);
 
@@ -64,7 +64,7 @@ function parseSettings2D(raw: string): Partial<Graph2DSettings> {
                 break;
 
             case "defaultColor":
-                settings.defaultColor = parseColorField(value);
+                settings.defaultColor = parseColorField(value, themeColors);
                 break;
 
             default:
@@ -123,10 +123,10 @@ function validateSettings2D(settings: Graph2DSettings): void {
     }
 }
 
-export function parse2D(source: string): Graph2D {
+export function parse2D(source: string, themeColors?: Record<string, string>): Graph2D {
     const { settingsSection, equationsSection } = splitSource(source);
-    const { equations, hint } = parseEquations(equationsSection);
-    const partialSettings = settingsSection ? parseSettings2D(settingsSection) : {};
+    const { equations, hint } = parseEquations(equationsSection, themeColors);
+    const partialSettings = settingsSection ? parseSettings2D(settingsSection, themeColors) : {};
 
     adjustBounds(partialSettings);
     const settings: Graph2DSettings = { ...DEFAULT_2D_SETTINGS, ...partialSettings };
@@ -134,7 +134,7 @@ export function parse2D(source: string): Graph2D {
 
     return {
         type: "2d",
-        equations: applyDefaultColor(equations, settings.defaultColor),
+        equations: applyDefaultColor(equations, settings.defaultColor, themeColors),
         settings,
         hash: makeHashFn("2d", equations, partialSettings),
         potentialErrorHint: hint,

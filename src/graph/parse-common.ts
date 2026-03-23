@@ -23,12 +23,16 @@ export function parseStringToEnum<V, T extends { [key: string]: V }>(obj: T, key
     return objKey ? obj[objKey] : null;
 }
 
-export function parseColor(value: string): Color | null {
+export function parseColor(value: string, themeColors?: Record<string, string>): Color | null {
     if (value.startsWith("#")) {
-        if (/^[0-9a-zA-Z]+$/.test(value.slice(1))) {
-            return value as Color;
-        }
+        if (/^[0-9a-zA-Z]+$/.test(value.slice(1))) return value as Color;
     }
+    
+    if (themeColors) {
+        const themed = themeColors[value.toLowerCase()];
+        if (themed) return themed as Color;
+    }
+    
     return parseStringToEnum(ColorConstant, value);
 }
 
@@ -49,7 +53,7 @@ export function splitSource(source: string): { settingsSection?: string; equatio
 
 // --- Equation Parsing ---
 
-export function parseEquation(eq: string): ParseResult<Equation> {
+export function parseEquation(eq: string, themeColors?: Record<string, string>): ParseResult<Equation> {
     let hint: PotentialErrorHint | undefined;
 
     const segments = eq
@@ -83,7 +87,7 @@ export function parseEquation(eq: string): ParseResult<Equation> {
             continue;
         }
 
-        const color = parseColor(segment);
+        const color = parseColor(segment, themeColors);
         if (color) {
             if (!equation.color) {
                 equation.color = color;
@@ -143,13 +147,13 @@ export function parseEquation(eq: string): ParseResult<Equation> {
     return { data: equation, hint };
 }
 
-export function parseEquations(equationsSection: string): { equations: Equation[]; hint?: PotentialErrorHint } {
+export function parseEquations(equationsSection: string, themeColors?: Record<string, string>): { equations: Equation[]; hint?: PotentialErrorHint } {
     let potentialErrorHint: PotentialErrorHint | undefined;
 
     const equations = equationsSection
         .split(/\r?\n/g)
         .filter((equation) => equation.trim() !== "")
-        .map(parseEquation)
+        .map((eq) => parseEquation(eq, themeColors))
         .map((result) => {
             if (result.hint) {
                 potentialErrorHint = result.hint;
@@ -163,9 +167,8 @@ export function parseEquations(equationsSection: string): { equations: Equation[
 // --- Settings Field Parsers ---
 
 export function parseBooleanField(key: string, value: string | undefined): boolean {
-    if (!value) {
-        return true;
-    }
+    if (!value) return true;
+
     const lower = value.toLowerCase();
     if (lower !== "true" && lower !== "false") {
         throw new SyntaxError(
@@ -176,38 +179,29 @@ export function parseBooleanField(key: string, value: string | undefined): boole
 }
 
 export function parseExpressionField(key: string, value: string | undefined): number {
-    if (value === undefined) {
-        throw new SyntaxError(`Field '${key}' must have a value`);
-    }
+    if (value === undefined) throw new SyntaxError(`Field '${key}' must have a value`);
     return math.evaluate(value);
 }
 
 export function parseStringField(key: string, value: string | undefined): string {
-    if (value === undefined) {
-        throw new SyntaxError(`Field '${key}' must have a value`);
-    }
+    if (value === undefined) throw new SyntaxError(`Field '${key}' must have a value`);
     return value;
 }
 
 export function parseDegreeModeField(value: string | undefined): DegreeMode {
-    if (value === undefined) {
-        throw new SyntaxError(`Field 'degreeMode' must have a value`);
-    }
+    if (value === undefined) throw new SyntaxError(`Field 'degreeMode' must have a value`);
+
     const mode: DegreeMode | null = parseStringToEnum(DegreeMode, value);
-    if (mode) {
-        return mode;
-    }
+    if (mode) return mode;
+
     throw new SyntaxError(`Field 'degreeMode' must be either 'radians' or 'degrees'`);
 }
 
-export function parseColorField(value: string | undefined): Color {
-    if (value === undefined) {
-        throw new SyntaxError(`Field 'defaultColor' must have a value`);
-    }
-    const color = parseColor(value);
-    if (color) {
-        return color;
-    }
+export function parseColorField(value: string | undefined, themeColors?: Record<string, string>): Color {
+    if (value === undefined) throw new SyntaxError(`Field 'defaultColor' must have a value`);
+
+    const color = parseColor(value, themeColors);
+    if (color) return color;
     throw new SyntaxError(
         `Field 'defaultColor' must be either a valid hex code or one of: ${Object.keys(ColorConstant).join(", ")}`
     );
@@ -244,14 +238,15 @@ export function extractSettingsEntries(raw: string): Array<[string, string | und
 
 // --- Default Color Application ---
 
-export function applyDefaultColor(equations: Equation[], defaultColor?: Color): Equation[] {
-    if (!defaultColor) {
-        return equations;
-    }
-    return equations.map((equation) => ({
-        color: equation.color ?? defaultColor,
-        ...equation,
-    }));
+export function applyDefaultColor(equations: Equation[], defaultColor?: Color, themeColors?: Record<string, string>): Equation[] {
+    const palette = themeColors ? Object.values(themeColors) : [];
+
+    return equations.map((equation, i) => {
+        if (equation.color) return equation;
+        const fallback = defaultColor ?? (palette.length > 0 ? palette[i % palette.length] as Color : undefined);
+        if (!fallback) return equation;
+        return { ...equation, color: fallback };
+    });
 }
 
 // --- Hash ---

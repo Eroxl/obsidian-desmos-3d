@@ -22,7 +22,7 @@ const DEFAULT_3D_SETTINGS: Graph3DSettings = {
     degreeMode: DegreeMode.Radians,
 };
 
-function parseSettings3D(raw: string): Partial<Graph3DSettings> {
+function parseSettings3D(raw: string, themeColors?: Record<string, string>): Partial<Graph3DSettings> {
     const settings: Partial<Graph3DSettings> = {};
     const entries = extractSettingsEntries(raw);
 
@@ -50,7 +50,7 @@ function parseSettings3D(raw: string): Partial<Graph3DSettings> {
                 break;
 
             case "defaultColor":
-                settings.defaultColor = parseColorField(value);
+                settings.defaultColor = parseColorField(value, themeColors);
                 break;
 
             default:
@@ -67,19 +67,19 @@ function validateSettings3D(settings: Graph3DSettings): void {
     }
 }
 
-export function parse3D(source: string): Graph3D {
+export function parse3D(source: string, themeColors?: Record<string, string>): Graph3D {
     const { settingsSection, equationsSection } = splitSource(source);
-    const { equations, hint } = parseEquations(equationsSection);
-    const partialSettings = settingsSection ? parseSettings3D(settingsSection) : {};
+    const { equations, hint } = parseEquations(equationsSection, themeColors);
+    const partialSettings = settingsSection ? parseSettings3D(settingsSection, themeColors) : {};
 
     const settings: Graph3DSettings = { ...DEFAULT_3D_SETTINGS, ...partialSettings };
     validateSettings3D(settings);
 
     return {
         type: "3d",
-        equations: applyDefaultColor(equations, settings.defaultColor),
+        equations: applyDefaultColor(equations, settings.defaultColor, themeColors),
         settings,
-        hash: makeHashFn("3d", equations, partialSettings),
+        hash: makeHashFn("3d", equations, (({ locked: _, ...rest }) => rest)(partialSettings)),
         potentialErrorHint: hint,
     };
 }

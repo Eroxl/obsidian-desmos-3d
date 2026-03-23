@@ -8,7 +8,7 @@ export async function calculateHash<T>(val: T): Promise<Hash> {
     if (typeof crypto !== "undefined") {
         const buffer = await crypto.subtle.digest("SHA-256", data);
         const raw = Array.from(new Uint8Array(buffer));
-        // Convery binary hash to hex
+        // Convert binary hash to hex
         const hash = raw.map((b) => b.toString(16).padStart(2, "0")).join("");
 
         return hash;
@@ -18,6 +18,35 @@ export async function calculateHash<T>(val: T): Promise<Hash> {
         const { createHash } = await import("crypto");
         return createHash("sha256").update(data).digest("hex");
     }
+}
+
+const COLOR_VARS = [
+    "--color-red",
+    "--color-orange",
+    "--color-yellow",
+    "--color-green",
+    "--color-cyan",
+    "--color-blue",
+    "--color-purple",
+    "--color-pink",
+] as const;
+
+/** Read the Obsidian color palette from CSS custom properties on the body element */
+export function readObsidianColors(): Record<string, string> {
+    const style = getComputedStyle(document.body);
+    const colors: Record<string, string> = {};
+    for (const v of COLOR_VARS) {
+        const value = style.getPropertyValue(v).trim();
+        if (value) colors[v.replace("--color-", "")] = value;
+    }
+
+    Object.keys(colors).forEach((key) => {
+        colors[key] = colors[key].replace(/rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/, (_, r, g, b) => {
+            return `#${[r, g, b].map((x) => parseInt(x).toString(16).padStart(2, "0")).join("")}`;
+        });
+    });
+    
+    return colors;
 }
 
 /** Unsafe cast method.
