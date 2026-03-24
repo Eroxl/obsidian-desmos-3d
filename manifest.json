@@ -1,7 +1,7 @@
 {
     "id": "desmos-3d",
     "name": "Desmos 3D",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "minAppVersion": "0.9.12",
     "description": "Desmos graph renderer with support for 3D graphs.",
     "author": "Eroxl",
