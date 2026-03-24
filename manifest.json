@@ -1,0 +1,8 @@
+{
+    "id": "obsidian-3d-desmos",
+    "name": "Desmos 3D",
+    "version": "0.0.1",
+    "minAppVersion": "0.9.12",
+    "description": "Desmos graph renderer for Obsidian with support for 3D graphs.",
+    "author": "Eroxl"
+}
