@@ -1,9 +1,0 @@
-{
-  "version": "0.6.8",
-  "renderer": true,
-  "cache": {
-    "enabled": true,
-    "location": "Filesystem",
-    "directory": ".obsidian/desmos-cache"
-  }
-}
