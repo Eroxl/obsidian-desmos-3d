@@ -53,7 +53,6 @@ export default class Desmos extends Plugin {
         this.registerMarkdownCodeBlockProcessor("desmos-graph-3d", async (source, el) => {
             try {
                 const colors = readObsidianColors();
-                console.log(colors);
                 const graph = parse3D(source, colors);
                 await this.renderer.render(graph, el);
             } catch (err) {
@@ -65,7 +64,7 @@ export default class Desmos extends Plugin {
         this.cache.getDesmosApi().catch(console.warn);
     }
 
-    async unload() {
+    unload() {
         this.renderer.deactivate();
     }
 

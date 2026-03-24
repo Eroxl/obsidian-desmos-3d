@@ -30,7 +30,7 @@ const API_URL = `https://www.desmos.com/api/${API_VERSION}/calculator.js?apiKey=
 export function createGraphCache(
     config: CacheConfig,
     storage: StorageAdapter,
-    fetchFn: (url: string) => Promise<string> = async (url) => (await fetch(url)).text()
+    fetchFn: (url: string) => Promise<string> = async (_) => ""
 ): GraphCache {
     const imageCache: Record<string, string> = {};
     const stateCache: Record<string, string> = {};

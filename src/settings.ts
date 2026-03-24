@@ -38,8 +38,7 @@ export function DEFAULT_SETTINGS(plugin: Desmos): Settings {
 }
 
 /** Attempt to migrate the given settings object to the current structure */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function migrateSettings(plugin: Desmos, settings: any): Settings {
+export function migrateSettings(plugin: Desmos, settings: Partial<Settings>): Settings {
     if (!Object.prototype.hasOwnProperty.call(settings, "renderer")) {
         settings.renderer = DEFAULT_SETTINGS_STATIC.renderer;
     }
@@ -96,7 +95,7 @@ export class SettingsTab extends PluginSettingTab {
 
             if (this.plugin.settings.cache.location === CacheLocation.Filesystem) {
                 new Setting(containerEl)
-                    .setName("Cache Directory")
+                    .setName("Cache directory")
                     .setDesc(
                         `The directory to save cached graphs in, relative to the vault root (technical note: the graphs will be saved as \`desmos-graph-<hash>.svg\` where the name is a SHA-256 hash of the graph source). Also note that a lot of junk will be saved to this folder, you have been warned.`
                     )

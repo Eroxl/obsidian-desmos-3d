@@ -25,12 +25,12 @@ export function parseStringToEnum<V, T extends { [key: string]: V }>(obj: T, key
 
 export function parseColor(value: string, themeColors?: Record<string, string>): Color | null {
     if (value.startsWith("#")) {
-        if (/^[0-9a-zA-Z]+$/.test(value.slice(1))) return value as Color;
+        if (/^[0-9a-zA-Z]+$/.test(value.slice(1))) return value;
     }
     
     if (themeColors) {
         const themed = themeColors[value.toLowerCase()];
-        if (themed) return themed as Color;
+        if (themed) return themed;
     }
     
     return parseStringToEnum(ColorConstant, value);
@@ -125,12 +125,17 @@ export function parseEquation(eq: string, themeColors?: Record<string, string>):
         if (segment.includes("\\")) {
             const view = document.createElement("span");
             const pre = document.createElement("span");
-            pre.innerHTML = "You may have tried to use the LaTeX syntax in the graph restriction (";
+            pre.innerText = "You may have tried to use the LaTeX syntax in the graph restriction (";
             const inner = document.createElement("code");
             inner.innerText = segment;
             const post = document.createElement("span");
-            post.innerHTML =
-                "), please use some sort of an alternative (e.g <code>\\frac{1}{2}</code> => <code>1/2</code>) as this is not supported by Desmos.";
+            post.append(
+                "), please use some sort of an alternative (e.g ",
+                Object.assign(document.createElement("code"), { textContent: "\\frac{1}{2}" }),
+                " => ",
+                Object.assign(document.createElement("code"), { textContent: "1/2" }),
+                ") as this is not supported by Desmos.",
+            );
             view.appendChild(pre);
             view.appendChild(inner);
             view.appendChild(post);
@@ -243,7 +248,7 @@ export function applyDefaultColor(equations: Equation[], defaultColor?: Color, t
 
     return equations.map((equation, i) => {
         if (equation.color) return equation;
-        const fallback = defaultColor ?? (palette.length > 0 ? palette[i % palette.length] as Color : undefined);
+        const fallback = defaultColor ?? (palette.length > 0 ? palette[i % palette.length] : undefined);
         if (!fallback) return equation;
         return { ...equation, color: fallback };
     });

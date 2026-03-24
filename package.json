@@ -32,7 +32,7 @@
         "looks-same": "^9.0.0",
         "mocha": "^9.2.2",
         "nyc": "^15.1.0",
-        "obsidian": "^0.16.3",
+        "obsidian": "^1.12.3",
         "prettier": "^2.6.2",
         "puppeteer": "^22.12.0",
         "rollup": "^2.51.2",

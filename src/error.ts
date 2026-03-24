@@ -2,7 +2,7 @@ export function renderError(err: string, el: HTMLElement, extra?: HTMLSpanElemen
     const wrapper = document.createElement("div");
 
     const message = document.createElement("strong");
-    message.innerText = "Desmos Graph Error: ";
+    message.innerText = "Desmos graph error: ";
     wrapper.appendChild(message);
 
     const ctx = document.createElement("span");
@@ -10,16 +10,15 @@ export function renderError(err: string, el: HTMLElement, extra?: HTMLSpanElemen
     wrapper.appendChild(ctx);
 
     if (extra) {
+        wrapper.appendChild(document.createElement("br"));
         const messageExtra = document.createElement("strong");
-        messageExtra.innerHTML = "<br>Note: ";
+        messageExtra.innerText = "Note: ";
         wrapper.appendChild(messageExtra);
         wrapper.appendChild(extra);
     }
 
     const container = document.createElement("div");
-    container.style.padding = "20px";
-    container.style.backgroundColor = "#f44336";
-    container.style.color = "white";
+    container.addClass("desmos-error");
     container.appendChild(wrapper);
 
     el.empty();

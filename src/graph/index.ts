@@ -7,7 +7,6 @@ export {
     Graph2DSettings,
     Graph3DSettings,
     BaseGraphSettings,
-    GraphSettings,
     Equation,
     Color,
     ColorConstant,

@@ -78,9 +78,6 @@ export interface Graph3D {
 
 export type Graph = Graph2D | Graph3D;
 
-/** @deprecated Use Graph2DSettings instead */
-export type GraphSettings = Graph2DSettings;
-
 export enum DegreeMode {
     Radians = "RADIANS",
     Degrees = "DEGREES",

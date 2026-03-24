@@ -1,0 +1,23 @@
+.desmos-error {
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+}
+
+.desmos-graph-iframe {
+    border: none;
+}
+
+.desmos-graph-lock-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.desmos-graph-lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: default;
+}

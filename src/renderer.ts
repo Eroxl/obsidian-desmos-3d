@@ -29,8 +29,7 @@ function buildExpressions(equations: Equation[]): string[] {
     const expressions: string[] = [];
 
     for (const equation of equations) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const expression: any = {
+        const expression: Record<string, unknown> = {
             color: equation.color,
             label: equation.label,
             hidden: equation.hidden,
@@ -238,42 +237,39 @@ export class Renderer {
     }
 
     public async render(graph: Graph, el: HTMLElement): Promise<void> {
-        document.getElementById('desmos-3d-styles')?.remove();
-        const cssPatch = `
-            <style id="desmos-3d-styles">
-                .dcg-svg-background {
-                    background: transparent !important;
-                    fill: transparent !important;
-                }
-
-                .dcg-svg-axis-line {
-                    stroke: var(--text-muted) !important;
-                }
-
-                .dcg-svg-major-gridline {
-                    stroke: var(--text-muted) !important;
-                    stroke-width: 1px !important;
-                }
-
-                .dcg-svg-minor-gridline {
-                    stroke: var(--text-muted) !important;
-                    stroke-width: 0.5px !important;
-                }
-
-                .block-language-desmos-graph text {
-                    stroke: none;
-                    fill: var(--text-muted) !important;
-                }
-
-                .block-language-desmos-graph > svg, .block-language-desmos-graph > iframe {
-                    display: block;
-                    margin-left: auto;
-                    margin-right: auto;
-                    border: 1px solid var(--text-muted) !important;
-                }
-            </style>
+        const cssPatchContent = `
+            .dcg-svg-background {
+                background: transparent !important;
+                fill: transparent !important;
+            }
+            .dcg-svg-axis-line {
+                stroke: var(--text-muted) !important;
+            }
+            .dcg-svg-major-gridline {
+                stroke: var(--text-muted) !important;
+                stroke-width: 1px !important;
+            }
+            .dcg-svg-minor-gridline {
+                stroke: var(--text-muted) !important;
+                stroke-width: 0.5px !important;
+            }
+            .block-language-desmos-graph text {
+                stroke: none;
+                fill: var(--text-muted) !important;
+            }
+            .block-language-desmos-graph > svg, .block-language-desmos-graph > iframe {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                border: 1px solid var(--text-muted) !important;
+            }
         `;
-        document.head.insertAdjacentHTML("beforeend", cssPatch);
+        document.getElementById('desmos-3d-styles')?.remove();
+        const style = document.createElement("style");
+        style.id = "desmos-3d-styles";
+        style.textContent = cssPatchContent;
+        document.head.appendChild(style);
+        const cssPatch = `<style>${cssPatchContent}</style>`;
 
         const hash = await graph.hash();
         const is3D = graph.type === "3d";
@@ -375,24 +371,16 @@ export class Renderer {
         iframe.sandbox.add("allow-scripts");
         iframe.width = graph.settings.width.toString();
         iframe.height = graph.settings.height.toString();
-        iframe.className = "desmos-graph";
-        iframe.style.border = "none";
-        iframe.scrolling = "no";
+        iframe.className = "desmos-graph desmos-graph-iframe";
         iframe.srcdoc = htmlSrc;
 
         if (graph.type === "3d" && graph.settings.locked) {
             const wrapper = document.createElement("div");
-            wrapper.style.position = "relative";
-            wrapper.style.display = "inline-block";
+            wrapper.addClass("desmos-graph-lock-wrapper");
             wrapper.appendChild(iframe);
 
             const overlay = document.createElement("div");
-            overlay.style.position = "absolute";
-            overlay.style.top = "0";
-            overlay.style.left = "0";
-            overlay.style.width = "100%";
-            overlay.style.height = "100%";
-            overlay.style.cursor = "default";
+            overlay.addClass("desmos-graph-lock-overlay");
             wrapper.appendChild(overlay);
         } else {
             el.appendChild(iframe);
@@ -404,11 +392,6 @@ export class Renderer {
     private async handler(
         message: MessageEvent<{ t: string; d: string; o: string; data: string; state?: string; hash: string; msg?: string }>
     ): Promise<void> {
-        if (message.data.t === "desmos-log") {
-            console.log("[desmos-ctx]", message.data.msg);
-            return;
-        }
-
         if (message.data.o !== window.origin || message.data.t !== "desmos-graph") return;
 
         const renderState = this.rendering.get(message.data.hash);
