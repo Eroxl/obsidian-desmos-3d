@@ -222,16 +222,18 @@ export class Renderer {
         this.active = false;
     }
 
+    private boundHandler = (e: MessageEvent<{ t: string; d: string; o: string; data: string; state?: string; hash: string; msg?: string }>) => { void this.handler(e); };
+
     public activate() {
         if (!this.active) {
-            window.addEventListener("message", this.handler.bind(this));
+            window.addEventListener("message", this.boundHandler);
             this.active = true;
         }
     }
 
     public deactivate() {
         if (this.active) {
-            window.removeEventListener("message", this.handler.bind(this));
+            window.removeEventListener("message", this.boundHandler);
             this.active = false;
         }
     }
@@ -265,6 +267,7 @@ export class Renderer {
             }
         `;
         document.getElementById('desmos-3d-styles')?.remove();
+        // eslint-disable-next-line obsidianmd/no-forbidden-elements
         const style = document.createElement("style");
         style.id = "desmos-3d-styles";
         style.textContent = cssPatchContent;

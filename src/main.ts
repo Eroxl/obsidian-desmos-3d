@@ -69,13 +69,13 @@ export default class Desmos extends Plugin {
     }
 
     async loadSettings() {
-        let settings = await this.loadData();
+        let settings: Settings = (await this.loadData()) as Settings;
 
         if (!settings) {
             settings = DEFAULT_SETTINGS(this);
         }
         if (settings.version !== this.manifest.version) {
-            settings = migrateSettings(this, settings);
+            settings = migrateSettings(this, settings as Partial<Settings>);
         }
 
         this.settings = settings;

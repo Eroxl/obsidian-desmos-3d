@@ -41,7 +41,7 @@ export function readObsidianColors(): Record<string, string> {
     }
 
     Object.keys(colors).forEach((key) => {
-        colors[key] = colors[key].replace(/rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/, (_, r, g, b) => {
+        colors[key] = colors[key].replace(/rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/, (_: string, r: string, g: string, b: string) => {
             return `#${[r, g, b].map((x) => parseInt(x).toString(16).padStart(2, "0")).join("")}`;
         });
     });

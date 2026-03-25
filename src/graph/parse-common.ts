@@ -185,7 +185,7 @@ export function parseBooleanField(key: string, value: string | undefined): boole
 
 export function parseExpressionField(key: string, value: string | undefined): number {
     if (value === undefined) throw new SyntaxError(`Field '${key}' must have a value`);
-    return math.evaluate(value);
+    return math.evaluate(value) as number;
 }
 
 export function parseStringField(key: string, value: string | undefined): string {

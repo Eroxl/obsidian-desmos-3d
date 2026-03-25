@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS_STATIC: Omit<Settings, "version"> = {
     cache: {
         enabled: true,
         location: CacheLocation.Filesystem,
+        // eslint-disable-next-line obsidianmd/hardcoded-config-path
         directory: ".obsidian/desmos-cache",
     },
 };
@@ -109,7 +110,7 @@ export class SettingsTab extends PluginSettingTab {
                 new Setting(containerEl)
                     .setName("Renderer")
                     .setDesc(
-                        "Whether to enable the graph renderer. Turning this off will prevent any new graphs from rendering, but will ensure all cached graphs are rendered instantly. If this is disabled, filesystem caching is recommended. This setting should be used for external exporting (such as to a website or pdf)."
+                        "Whether to enable the graph renderer. Turning this off will prevent any new graphs from rendering, but will ensure all cached graphs are rendered instantly. If this is disabled, filesystem caching is recommended. This setting should be used for external exporting (such as to a website or PDF)."
                     )
                     .addToggle((toggle) =>
                         toggle.setValue(this.plugin.settings.renderer).onChange(async (value) => {
