@@ -267,6 +267,7 @@ export class Renderer {
             }
         `;
         document.getElementById('desmos-3d-styles')?.remove();
+        // NOTE(evan): This CSS is injected into an iframe so I don't think styles.css can be loaded into it.
         // eslint-disable-next-line obsidianmd/no-forbidden-elements
         const style = document.createElement("style");
         style.id = "desmos-3d-styles";

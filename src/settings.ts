@@ -1,5 +1,5 @@
 import Desmos from "./main";
-import { PluginSettingTab, App, Setting } from "obsidian";
+import { PluginSettingTab, App, Setting, Vault } from "obsidian";
 
 export enum CacheLocation {
     Memory = "Memory",
@@ -25,13 +25,17 @@ const DEFAULT_SETTINGS_STATIC: Omit<Settings, "version"> = {
     cache: {
         enabled: true,
         location: CacheLocation.Filesystem,
-        // eslint-disable-next-line obsidianmd/hardcoded-config-path
-        directory: ".obsidian/desmos-cache",
     },
 };
 
 /** Get the default settings for the given plugin. This simply uses `DEFAULT_SETTINGS_STATIC` and patches the version from the manifest. */
 export function DEFAULT_SETTINGS(plugin: Desmos): Settings {
+    const configPath = plugin.app.vault.configDir;
+
+    if (configPath) {
+        DEFAULT_SETTINGS_STATIC.cache.directory = `${configPath}/desmos-cache`;
+    }
+
     return {
         version: plugin.manifest.version,
         ...DEFAULT_SETTINGS_STATIC,
