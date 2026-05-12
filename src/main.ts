@@ -1,5 +1,5 @@
 import { parse2D, parse3D } from "./graph";
-import { Plugin } from "obsidian";
+import { Plugin, requestUrl } from "obsidian";
 import { Renderer } from "./renderer";
 import { renderError } from "./error";
 import { createGraphCache, GraphCache } from "./cache";
@@ -32,7 +32,10 @@ export default class Desmos extends Plugin {
                 read: (p) => this.app.vault.adapter.read(p),
                 write: (p, d) => this.app.vault.adapter.write(p, d),
                 mkdir: (p) => this.app.vault.adapter.mkdir(p),
-            }
+            },
+            (url) => requestUrl(url).then((res) => {
+                return res.text;
+            })
         );
 
         this.renderer = new Renderer(this.cache, this.settings);
